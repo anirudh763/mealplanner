@@ -5,16 +5,22 @@ import Planner from "./components/Planner";
 import Recipes from "./components/Recipes";
 import GroceryList from "./components/GroceryList";
 import Nutrition from "./components/Nutrition";
+import AuthScreen from "./components/AuthScreen";
 import { sampleRecipes } from "./data/sampleRecipes";
 import { usePersistentState } from "./lib/storage";
 import { startOfWeek, addDays, toKey } from "./lib/dates";
 
-export default function App() {
+const SESSION_KEY = "kl.session";
+
+function MealPlannerApp({ username, onLogout }) {
   const [tab, setTab] = useState("planner");
   const [weekStart, setWeekStart] = useState(() => startOfWeek(new Date()));
-  const [recipes, setRecipes] = usePersistentState("kl.recipes", sampleRecipes);
-  const [plan, setPlan] = usePersistentState("kl.plan", {});
-  const [checked, setChecked] = usePersistentState(`kl.checked.${toKey(weekStart)}`, {});
+  const [recipes, setRecipes] = usePersistentState(`kl.recipes.${username}`, sampleRecipes);
+  const [plan, setPlan] = usePersistentState(`kl.plan.${username}`, {});
+  const [checked, setChecked] = usePersistentState(
+    `kl.checked.${username}.${toKey(weekStart)}`,
+    {}
+  );
 
   return (
     <div className="min-h-screen">
@@ -26,7 +32,17 @@ export default function App() {
               weekly meal planning, itemized
             </p>
           </div>
-          <span className="stamp text-stamp hidden sm:inline-block">Est. this week</span>
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[11px] text-ink2 hidden sm:inline">
+              signed in as <span className="text-ink">{username}</span>
+            </span>
+            <button
+              onClick={onLogout}
+              className="stamp text-ink2 hover:text-stamp hover:border-stamp transition-colors"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
       </header>
 
@@ -69,4 +85,14 @@ export default function App() {
       </footer>
     </div>
   );
+}
+
+export default function App() {
+  const [session, setSession] = usePersistentState(SESSION_KEY, null);
+
+  if (!session) {
+    return <AuthScreen onAuthed={(username) => setSession(username)} />;
+  }
+
+  return <MealPlannerApp username={session} onLogout={() => setSession(null)} />;
 }
