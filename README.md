@@ -1,7 +1,7 @@
-# Name : Anirudh 
+# Name : Anirudh Yadav Boosa
 
 
-# The Kitchen Ledger 🍽️
+# The Kitchen Ledger
 
 A full weekly meal planner: plan meals, auto-generate a grocery list, and track nutrition — built as a receipt-style "kitchen ledger." All data is stored locally in your browser (`localStorage`), so there's no backend or database to set up.
 
